@@ -6,10 +6,10 @@ dotenv.config({path:path.join(__dirname,'../.env')});
 // console.log(path.join(__dirname,'../.env'))
 
 interface IenvSchema {
-    NODE_ENV : string,
-    NODE_WORK : string,
-    PORT : number,
-    MONGO_URI : string,
+    NODE_ENV : string,// "production"|"dev"|"test",
+    NODE_WORK : string //"LOCAL" | "",
+    PORT : number
+    MONGO_URI : string
     MONGO_DB_USERNAME : string,
     MONGO_DB_PASSWORD : string,
     OTP_EXPIRATION_MINUTES : string,
@@ -23,7 +23,7 @@ interface IenvSchema {
 
 const envSchema: Joi.ObjectSchema<IenvSchema> = Joi.object()
     .keys({
-        NODE_ENV:Joi.string().valid('production','development','test').required(),
+        NODE_ENV:Joi.string().valid('production','dev','test').required(),
 
         NODE_WORK:Joi.string().valid('LOCAL', '').optional(),
 
@@ -43,7 +43,7 @@ const envSchema: Joi.ObjectSchema<IenvSchema> = Joi.object()
         JWT_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().required(),
 
-        ALGO: Joi.string().required().allow(['aes-192-cbc']),
+        ALGO: Joi.string().required().allow('aes-192-cbc'),
         ENC_SECRET: Joi.string().required(),
         IV_LENGTH: Joi.number().required(),
     }).unknown();
@@ -55,18 +55,22 @@ if (error) {
     throw new Error(`Config validation error: ${error.message}`);
 }
 
-export default {
-    NODE_ENV : process.env.NODE_ENV!,
-    NODE_WORK : process.env.NODE_WORK!,
-    PORT : process.env.PORT!,
-    MONGO_URI : process.env.MONGO_URI!,
-    MONGO_DB_USERNAME : process.env.MONGO_DB_USERNAME!,
-    MONGO_DB_PASSWORD : process.env.MONGO_DB_PASSWORD!,
-    OTP_EXPIRATION_MINUTES : process.env.OTP_EXPIRATION_MINUTES!,
-    JWT_SECRET : process.env.JWT_SECRET!,
-    JWT_ACCESS_EXPIRATION_MINUTES : process.env.JWT_ACCESS_EXPIRATION_MINUTES!,
+class EnvironmentClass implements IenvSchema{
+    readonly NODE_ENV = process.env.NODE_ENV!;
+    readonly NODE_WORK = process.env.NODE_WORK!;
+    readonly PORT = <number><unknown>process.env.PORT;
+    readonly MONGO_URI = process.env.MONGO_URI!;
+    readonly MONGO_DB_USERNAME = process.env.MONGO_DB_USERNAME!;
+    readonly MONGO_DB_PASSWORD = process.env.MONGO_DB_PASSWORD!;
+    readonly OTP_EXPIRATION_MINUTES = process.env.OTP_EXPIRATION_MINUTES!;
+    readonly JWT_SECRET = process.env.JWT_SECRET!;
+    readonly JWT_ACCESS_EXPIRATION_MINUTES = <number><unknown>process.env.JWT_ACCESS_EXPIRATION_MINUTES;
 
-    ALGO : process.env.ALGO!,
-    ENC_SECRET : process.env.ENC_SECRET!,
-    IV_LENGTH : process.env.IV_LENGTH!
+    readonly ALGO = process.env.ALGO!;
+    readonly ENC_SECRET = process.env.ENC_SECRET!;
+    readonly IV_LENGTH = <number><unknown>process.env.IV_LENGTH!
 }
+
+const EnvironmentObject = new EnvironmentClass()
+
+export default EnvironmentObject;

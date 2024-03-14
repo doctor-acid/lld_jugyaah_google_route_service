@@ -1,7 +1,7 @@
 import { PathLike } from "fs"
 
 // usable to define logging level and type
-type logType = "file" | "console" | "dev"
+export type logType = "file" | "console" | "dev"
 
 type colorType = "error" | "warn" | "info"
 
